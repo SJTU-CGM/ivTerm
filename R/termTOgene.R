@@ -47,7 +47,7 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
         navbarPage(
         "ivTerm",
         tabPanel(
-          "Upload File",
+          "File Upload",
           sidebarLayout(
             sidebarPanel(
               width = 4,
@@ -121,7 +121,7 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
                                   colourpicker::colourInput("barplot_bar_color", "Bar color", "gray"),
                                   textInput("barplot_lg_title", "Legend title", ""),
                                   selectInput("barplot_lg_pos", "Legend position", c("right", "top", "bottom", "left")),
-                                  checkboxInput("barplot_side_rev", "Side reverse", FALSE)
+                                  checkboxInput("barplot_side_rev", "Reverse", FALSE)
                                   ),
                            column(width = 6,
                                   numericInput("barplot_width", "Width", value = 1000),
@@ -212,7 +212,7 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
                                   numericInput("lollipop_lg_title_size", "Legend title size", 10),
                                   selectInput("lollipop_lg_pos", "Legend position", c("right", "top", "bottom", "left")),
                                   colourpicker::colourInput("lollipop_line_color", "Line color", "gray"),
-                                  checkboxInput("lollipop_side_rev", "Side reverse", FALSE)),
+                                  checkboxInput("lollipop_side_rev", "Reverse", FALSE)),
                            column(width = 6,
                                   numericInput("lollipop_width", "Width", value = 1000),
                                   numericInput("lollipop_x_title_size", "X title size", 10),
@@ -1032,7 +1032,8 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
               theme(axis.text.y = element_text(size = input$lollipop_y_text_size))
           } else {
             p <- p +
-              geom_text(aes(label = term_id, y = ifelse(.data[[input$lollipop_side]] == sides[x_side],
+              geom_text(aes(label = .data[[input$lollipop_y]],
+                            y = ifelse(.data[[input$lollipop_side]] == sides[x_side],
                                                         x_limits[2] * -.01, x_limits[2] * .01),
                             hjust = ifelse(.data[[input$lollipop_side]] == sides[x_side], 1, 0)),
                         size = input$lollipop_y_text_size * 0.376) +
@@ -1938,6 +1939,7 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
             }
             p <- p +
               theme_classic() +
+              labs(y = "Density") +
               scale_x_continuous(expand = expansion(mult = c(0, .05))) +
               scale_y_continuous(expand = expansion(mult = c(0, .05)))
 
@@ -2013,7 +2015,8 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
             p <- ggplot(p_data, aes(y = y, color = group, fill = group, group = group, tooltip = y)) +
               geom_boxplot_interactive(aes(x = x - .15), width = .4, alpha = .5) +
               geom_jitter_interactive(aes(x = x + .25), width = .1) +
-              scale_x_continuous(breaks = unique(p_data$x), labels = curr_factor[unique(p_data$x)]) +
+              scale_x_continuous(breaks = unique(p_data$x),
+                                 labels = unique(curr_factor)[unique(p_data$x)]) +
               labs(x = ifelse(input$box_x == "-", "", input$box_x),
                    y = input$box_y) +
               theme_classic() +
