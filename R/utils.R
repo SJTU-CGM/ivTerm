@@ -21,7 +21,7 @@ getqualcolor <- function(colors_n) {
     "Set1", paste0(" scales::brewer_pal(palette = 'Set1')(", colors_n, ")"), 9,
     "Set2", paste0(" scales::brewer_pal(palette = 'Set2')(", colors_n, ")"), 8,
     "Set3", paste0(" scales::brewer_pal(palette = 'Set3')(", colors_n, ")"), 12,
-    "Paired", paste0(" scales::brewer_pal(palette = 'Paired')(", colors_n, ")"), 8,
+    "Paired", paste0(" scales::brewer_pal(palette = 'Paired')(", colors_n, ")"), 12,
     "Pastel1", paste0(" scales::brewer_pal(palette = 'Pastel1')(", colors_n, ")"), 9,
     "Pastel2", paste0(" scales::brewer_pal(palette = 'Pastel2')(", colors_n, ")"), 8,
     "Dark2", paste0(" scales::brewer_pal(palette = 'Dark2')(", colors_n, ")"), 8,

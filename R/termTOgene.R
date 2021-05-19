@@ -1960,7 +1960,7 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
               scale_x_continuous(expand = expansion(mult = c(0, .05))) +
               scale_y_continuous(expand = expansion(mult = c(0, .05)))
 
-            x <- girafe(ggobj = p, height_svg = input$density_height/100, width_svg = input$density_width/100)
+            x <- girafe(ggobj = p, height_svg = input$hist_height/100, width_svg = input$hist_width/100)
           } else if (type == "bar"){
 
               p <- ggplot(curr_data, aes( x = .data[[input$bar_x]],
@@ -2011,12 +2011,18 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
 
             curr_factor <- factor(p_data$group)
             p_data$x <- as.numeric(curr_factor)
+            p_colors <- structure(scales::hue_pal()(length(levels(curr_factor))),
+                                  names = levels(curr_factor))
 
             p <- ggplot(p_data, aes(y = y, color = group, fill = group, group = group, tooltip = y)) +
-              geom_boxplot_interactive(aes(x = x - .15), width = .4, alpha = .5) +
+              geom_boxplot_interactive(
+                data = subset(p_data, group %in% names(table(p_data$group)[table(p_data$group) > 1])),
+                aes(x = x - .15), width = .4, alpha = .5) +
               geom_jitter_interactive(aes(x = x + .25), width = .1) +
               scale_x_continuous(breaks = unique(p_data$x),
                                  labels = unique(curr_factor)[unique(p_data$x)]) +
+              scale_color_manual(values = p_colors) +
+              scale_fill_manual(values = p_colors) +
               labs(x = ifelse(input$box_x == "-", "", input$box_x),
                    y = input$box_y) +
               theme_classic() +
@@ -2054,7 +2060,10 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
 
               new_data <- curr_data[, c(input$violin_x, input$violin_y, "gene")]
               colnames(new_data) <- c("group", "y", "gene")
-              new_data$x <- as.numeric(factor(new_data$group))
+              curr_factor <- factor(new_data$group)
+              new_data$x <- as.numeric(curr_factor)
+              p_colors <- structure(scales::hue_pal()(length(levels(curr_factor))),
+                                    names = levels(curr_factor))
 
               group_list <- levels(factor(new_data$group))
               p_data <- do.call(rbind, lapply(1:length(group_list), function(x){
@@ -2072,6 +2081,8 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
                 geom_polygon(data = p_data, aes(x = -den + x, y = loc, fill = group, color = group), alpha = .5) +
                 geom_jitter_interactive(data = new_data, aes(x = x + .25, y = y, color = group, tooltip = gene), width = .125) +
                 scale_x_continuous(breaks = 1:length(group_list), labels = group_list) +
+                scale_color_manual(values = p_colors) +
+                scale_fill_manual(values = p_colors) +
                 labs(x = input$violin_x, y = input$violin_y) +
                 theme_classic() + theme(legend.position = "none")
 
@@ -2109,10 +2120,10 @@ termTOgene <- function(shiny.maxRequestSize = 100 * 1024^2, launch.browser = T){
             p <- ggplot(curr_data) +
               geom_segment(aes(x = .data[[input$dumbbell_x1]], xend = .data[[input$dumbbell_x2]],
                                y = .data[[input$dumbbell_y]], yend = .data[[input$dumbbell_y]]), color = "gray") +
-              geom_point(aes(x = .data[[input$dumbbell_x1]], y = .data[[input$dumbbell_y]]), color = scales::hue_pal()(2)[1]) +
-              geom_point(aes(x = .data[[input$dumbbell_x2]], y = .data[[input$dumbbell_y]]), color = scales::hue_pal()(2)[2]) +
+              geom_point(aes(x = .data[[input$dumbbell_x1]], y = .data[[input$dumbbell_y]], color = input$dumbbell_x1)) +
+              geom_point(aes(x = .data[[input$dumbbell_x2]], y = .data[[input$dumbbell_y]], color = input$dumbbell_x2)) +
               theme_bw() +
-              labs(x = paste0(input$dumbbell_x1, "　~　", input$dumbbell_x2)) +
+              labs(x = "", color = "") +
               theme(panel.grid = element_blank())
 
             x <- girafe(ggobj = p, height_svg = input$dumbbell_height/100, width_svg = input$dumbbell_width/100)
